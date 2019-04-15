@@ -16,14 +16,18 @@ class PlanetSearch extends React.Component {
   _onChange = e => {
     let value = e.target.value;
     let { serchPlanets, getPlanets } = this.props;
-    this.setState({
-      searchText: value
-    });
-    if (!value) {
-      getPlanets && getPlanets();
-      return;
-    }
-    serchPlanets({ data: this.state.searchText });
+    this.setState(
+      {
+        searchText: value
+      },
+      () => {
+        if (!value) {
+          getPlanets && getPlanets();
+          return;
+        }
+        serchPlanets && serchPlanets({ data: this.state.searchText });
+      }
+    );
   };
   render() {
     let {
