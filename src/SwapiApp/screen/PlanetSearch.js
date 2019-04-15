@@ -3,18 +3,52 @@ import { SearchBar, LoadingIndicator, Card, BigCard } from "../components";
 import classNames from "classnames";
 import { sortArray } from "../Utility";
 
+const SPECIAL_USER = ["luke skywalker"];
+
 class PlanetSearch extends React.Component {
-  state = {
-    searchText: ""
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      searchText: ""
+    };
+    this.isSpecialUser = this._isSpecialUser(props.user); //to check it is special user
+    this.timeOut = null;
+    this.count = 0;
+    this.warningGiven = false;
+  }
+
   componentDidMount() {
     let { getPlanets } = this.props;
     //load initial data to render
     getPlanets && getPlanets();
   }
 
+  _isSpecialUser = (user = {}) => {
+    let { name } = user;
+    let index = SPECIAL_USER.findIndex(item => {
+      return item.toLocaleLowerCase() == name.toLocaleLowerCase();
+    });
+    return index >= 0;
+  };
+
   _onChange = e => {
     let value = e.target.value;
+    //validate time limit of users to search
+    if (!this._userSearchValidate()) {
+      alert("only special user allow to search more than 15 in a minute");
+      if (!this.warningGiven) {
+        this.warningGiven = true;
+        this._updateState("");
+      }
+    } else {
+      this._updateState(value);
+    }
+    // setting count of user type ended
+    clearTimeout(this.timeOut);
+    this.timeOut = setTimeout(this._afterSearch, 400);
+  };
+
+  _updateState = value => {
     let { serchPlanets, getPlanets } = this.props;
     this.setState(
       {
@@ -29,6 +63,35 @@ class PlanetSearch extends React.Component {
       }
     );
   };
+  _afterSearch = () => {
+    //after type ended update the counter by one, and last typed time
+    this.count = (this.count || 0) + 1;
+    if (!this.initialSearch) {
+      this.initialSearch = new Date();
+    }
+    this.lastSearch = new Date();
+  };
+
+  _userSearchValidate = () => {
+    //if user is special or initial search time is undefined , then not validate time search in a limit
+    if (this.isSpecialUser || !this.initialSearch) {
+      return true;
+    }
+    if (this.lastSearch - this.initialSearch < 1000 * 60) {
+      if (this.count < 15) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      this.count = 0;
+      this.initialSearch = null;
+      this.lastSearch = null;
+      this.warningGiven = null;
+      return true;
+    }
+  };
+
   render() {
     let {
       props: { data = {} },

@@ -11,7 +11,8 @@ const PlanetSearchContainer = props => {
 export default connect(
   store => {
     return {
-      data: store.planets
+      data: store.planets,
+      user: store.auth.user
     };
   },
   { getPlanets, serchPlanets }
