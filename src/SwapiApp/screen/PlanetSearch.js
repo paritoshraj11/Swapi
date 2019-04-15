@@ -43,9 +43,9 @@ class PlanetSearch extends React.Component {
     } else {
       this._updateState(value);
     }
-    // setting count of user type ended
+    // incrementing count of user after type ended
     clearTimeout(this.timeOut);
-    this.timeOut = setTimeout(this._afterSearch, 400);
+    this.timeOut = setTimeout(this._afterSearch, 350);
   };
 
   _updateState = value => {
