@@ -47,6 +47,8 @@ export const authUser = store => {
       .catch(err => {
         alert(err);
       });
+  } else {
+    store.dispatch({ type: USER_LOADING, payload: false });
   }
 };
 
